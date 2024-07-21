@@ -1,6 +1,9 @@
 const Users = require("../model/userModel")
+// const bcrypt = require("bcryptjs")
+// const jwt = require("jsonwebtoken")
 const bcrypt = require("bcryptjs")
-const jwt = require("jsonwebtoken")
+const jwt = require('jsonwebtoken'); // Correct module name
+
 
 const createUser = async (req, res) => {
     // step 1 : Check if data is coming or not

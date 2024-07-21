@@ -1,12 +1,18 @@
-// importing any necessary packages
+// importing necessary packages
 const mongoose = require('mongoose');
 
-// function (Any)
-const connectDB = () => {
-    mongoose.connect(process.env.DB_URL).then(() =>{
-    console.log("Connected to Database")
-})
+// function to connect to MongoDB
+const connectDB = async () => {
+    try {
+        await mongoose.connect(process.env.DB_URL, {
+            useNewUrlParser: true, // Use the new URL string parser
+            useUnifiedTopology: true, // Use the new Server Discover and Monitoring engine
+        });
+        console.log("Connected to Database");
+    } catch (error) {
+        console.error("Error connecting to Database:", error.message);
+    }
 }
 
-// export 
+// export the function
 module.exports = connectDB;

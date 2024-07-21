@@ -26,9 +26,9 @@ app.use(multiparty())
 // cloudinary config
           
 cloudinary.config({ 
-    cloud_name: process.env.CLOUD_NAME, 
-    api_key: process.env.API_KEY, 
-    api_secret: process.env.API_SECRET
+    cloud_name:'dslamgamd',
+    api_key: '576226748471547',
+    api_secret:'5O2OjBI1zxeAUPRgRPg9YAzfYNw'
   });
 // mongodb connection
 connectDB();
@@ -53,7 +53,7 @@ app.use('/api/product', require('./routes/productRoutes'))
 
 
 // defining port
-const PORT = process.env.PORT || 5050;
+const PORT = process.env.PORT || 5051;
 // run the server
 app.listen(PORT, ()=>{
     console.log(`Server is running on port ${PORT}`)
