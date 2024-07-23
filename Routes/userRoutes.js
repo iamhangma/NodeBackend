@@ -1,6 +1,6 @@
 // import
 const router = require('express').Router();
-const userController = require("../controllers/userControllers")
+const userController = require("../Controllers/userControllers")
 
 // create user api
 router.post('/create', userController.createUser)

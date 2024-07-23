@@ -43,7 +43,7 @@ app.get('/test',(req,res)=>{
 // http://localhost:5000/test
 
 // user routes
-app.use('/api/user', require('./routes/userRoutes'))
+app.use('/api/user', require('./Routes/userRoutes'))
 // our actual routes
 // http://localhost:5000/api/user/create
 // http://localhost:5000/api/user/login
@@ -52,7 +52,7 @@ app.use('/api/user', require('./routes/userRoutes'))
 app.use('/api/product', require('./routes/productRoutes'))
 
 
-// defining port
+// defining ports
 const PORT = process.env.PORT || 5051;
 // run the server
 app.listen(PORT, ()=>{

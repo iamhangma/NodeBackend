@@ -1,121 +1,105 @@
-const Users = require("../model/userModel")
-// const bcrypt = require("bcryptjs")
-// const jwt = require("jsonwebtoken")
-const bcrypt = require("bcryptjs")
-const jwt = require('jsonwebtoken'); // Correct module name
-
+const bcrypt = require("bcryptjs");
+const jwt = require('jsonwebtoken');
+const Users = require("../model/userModel");
 
 const createUser = async (req, res) => {
-    // step 1 : Check if data is coming or not
     console.log(req.body);
 
-    // step 2 : Destructure the data
-    const { firstName, lastName,phoneNumber ,email, password } = req.body;
+    const { firstName, email, createpassword, confirmPassword } = req.body;
 
-    // step 3 : validate the incomming data
-    if (!firstName || !lastName ||phoneNumber|| !email || !password) {
+    if (!firstName || !email || !createpassword || !confirmPassword) {
         return res.json({
             success: false,
-            message: "Please fill all the fields."
-        })
+            message: "Please fill all the required fields."
+        });
     }
 
-    // step 4 : try catch block
+    if (createpassword !== confirmPassword) {
+        return res.json({
+            success: false,
+            message: "Passwords do not match."
+        });
+    }
+
     try {
-        // step 5 : Check existing user
-        const existingUser = await Users.findOne({ email: email })
+        const existingUser = await Users.findOne({ email: email });
         if (existingUser) {
             return res.json({
                 success: false,
                 message: "User already exists."
-            })
+            });
         }
 
-        // password encryption
         const randomSalt = await bcrypt.genSalt(10);
-        const encryptedPassword = await bcrypt.hash(password, randomSalt)
+        const encryptedPassword = await bcrypt.hash(createpassword, randomSalt);
 
-        // step 6 : create new user
         const newUser = new Users({
-            // fieldname : incomming data name
             firstName: firstName,
-            lastName: lastName,
-            phoneNumber:phoneNumber,
             email: email,
-            password: encryptedPassword,
-        })
+            createpassword: encryptedPassword,
+            confirmPassword: encryptedPassword,
+        });
 
-        // step 7 : save user and response
         await newUser.save();
         res.status(200).json({
             success: true,
             message: "User created successfully."
-        })
-
+        });
 
     } catch (error) {
         console.log(error);
-        res.status(500).json("Server Error")
+        res.status(500).json("Server Error");
     }
-
-
-}
+};
 
 const loginUser = async (req, res) => {
-    // Step 1 : Check if data is coming or not
     console.log(req.body);
 
-    // step 2 : Destructure the data
-    const {email, password} = req.body;
+    const { email, password } = req.body;
 
-    // step 3 : validate the incomming data
-    if(!email || !password){
+    if (!email || !password) {
         return res.json({
-            success : false,
-            message : "Please fill all the fields."
-        })
+            success: false,
+            message: "Please fill all the fields."
+        });
     }
 
-    // step 4 : try catch block
     try {
-        // step 5 : Find user
-        const user = await Users.findOne({email : email}) // user store all the data of user
-        if(!user){
+        const user = await Users.findOne({ email: email });
+        if (!user) {
             return res.json({
-                success : false,
-                message : "User does not exists."
-            })
-        }
-        // Step 6 : Check password
-        const passwordToCompare = user.password;
-        const isMatch = await bcrypt.compare(password, passwordToCompare)
-        if(!isMatch){
-            return res.json({
-                success : false,
-                message : "Password does not match."
-            })
+                success: false,
+                message: "User does not exist."
+            });
         }
 
-        // Step 7 : Create token
+        const isMatch = await bcrypt.compare(password, user.createpassword);
+        if (!isMatch) {
+            return res.json({
+                success: false,
+                message: "Password does not match."
+            });
+        }
+
         const token = jwt.sign(
-            {id : user._id, isAdmin : user.isAdmin},
+            { id: user._id, isAdmin: user.isAdmin },
             process.env.JWT_TOKEN_SECRET,
-        )
+        );
 
-        // Step 8 : Send Response
         res.status(200).json({
-            success : true,
-            token : token,
-            userData : user,
-            message : "User logged in successfully."
-        })
-        
+            success: true,
+            token: token,
+            userData: user,
+            message: "User logged in successfully."
+        });
+
     } catch (error) {
         console.log(error);
-        res.json(error)
+        res.status(500).json({ success: false, message: "Server Error" });
     }
-}
+};
 
 module.exports = {
-    createUser, loginUser
-}
+    createUser,
+    loginUser
+};
